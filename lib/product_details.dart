@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as htmlparser;
 import 'package:perfume_hub_app/product_chart.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetails extends StatefulWidget {
   final Map<String, dynamic> object;
@@ -97,11 +98,10 @@ class _ProductDetailsState extends State<ProductDetails> {
           element.getElementsByClassName('btn-go-to').first.attributes['href'];
 
       final offer = Offers(
-        shopName: shopName.trim() ?? '',
-        productName: productName.trim() ?? '',
-        price: price.trim() ?? '',
-        shopUrl: shopUrl.trim() ?? '',
-      );
+          shopName: shopName.trim() ?? '',
+          productName: productName.trim() ?? '',
+          price: price.trim() ?? '',
+          shopUrl: shopUrl.trim());
       offers.add(offer);
     });
   }
@@ -123,6 +123,12 @@ class _ProductDetailsState extends State<ProductDetails> {
 
       getProductCapacities(document);
       getProductOffers(document);
+    }
+  }
+
+  Future<void> openURL(url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     }
   }
 
@@ -215,12 +221,12 @@ class _ProductDetailsState extends State<ProductDetails> {
           shadowColor: Colors.white,
           surfaceTintColor: Colors.white,
           child: ListTile(
-            onTap: () {},
+            onTap: () => openURL(offer.shopUrl),
             title: Text(
               offer.productName,
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
-            subtitle: Text(offer.shopName),
+            subtitle: Text(offer.shopUrl),
             trailing: Text(offer.price),
             dense: true,
           ),
