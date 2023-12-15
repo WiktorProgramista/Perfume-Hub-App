@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:http/http.dart' as http;
@@ -18,12 +17,14 @@ class Product {
   final String subtitle;
   final String imageUrl;
   final String price;
+  final String priceChange;
 
   Product({
     required this.title,
     required this.subtitle,
     required this.imageUrl,
     required this.price,
+    required this.priceChange,
   });
 }
 
@@ -66,17 +67,17 @@ class _HomeScreenState extends State<HomeScreen> {
         var subtitleElement = element.querySelector('.card-subtitle');
         var imageElement = element.querySelector('.image-container img');
         var priceElement = element.querySelector('.price');
+        var priceChangeElement = element.querySelector('span');
 
         final product = Product(
           title: titleElement?.text.trim() ?? '',
           subtitle: subtitleElement?.text.trim() ?? '',
           imageUrl: imageElement?.attributes['src'] ?? '',
           price: priceElement?.text.trim() ?? '',
+          priceChange: priceChangeElement?.text.trim() ?? '',
         );
 
-        setState(() {
-          products.add(product);
-        });
+        products.add(product);
       }
     }
   }
@@ -182,6 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          Text(product.priceChange),
           SizedBox(
             width: 150,
             height: 150,
@@ -197,8 +199,8 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   product.title,
-                  style: const TextStyle(
-                    fontSize: 18,
+                  style: TextStyle(
+                    fontSize: product.title.length < 20 ? 18 : 16,
                     fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
