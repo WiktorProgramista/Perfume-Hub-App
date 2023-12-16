@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+// ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
+// ignore: depend_on_referenced_packages
 import 'package:html/parser.dart' as htmlparser;
 import 'package:perfume_hub_app/multi_select.dart';
 import 'package:perfume_hub_app/product_details.dart';
@@ -42,21 +45,37 @@ class _HomeScreenState extends State<HomeScreen> {
     'zestaw',
     'nie zestaw'
   ];
-
   List<Map<String, dynamic>> responseData = [];
-
   List filteredData = [];
-
   List<Product> products = [];
+  final scrolController = ScrollController();
+  int _currentPage = 1;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    fetchProducts();
+    scrolController.addListener(_scrollListener);
+    fetchProducts(1);
   }
 
-  Future<void> fetchProducts() async {
-    final response = await http.get(Uri.parse('https://perfumehub.pl'));
+  Future<void> _scrollListener() async {
+    if (scrolController.position.pixels ==
+        scrolController.position.maxScrollExtent) {
+      setState(() {
+        isLoading = true;
+      });
+      _currentPage++;
+      await fetchProducts(_currentPage);
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> fetchProducts(int page) async {
+    final response =
+        await http.get(Uri.parse('https://perfumehub.pl/?page=$page'));
     if (response.statusCode == 200) {
       final document = htmlparser.parse(response.body);
       final elements =
@@ -79,6 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
         products.add(product);
       }
+    } else {
+      throw Exception('Request API error');
     }
   }
 
@@ -311,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-        future: fetchProducts(),
+        future: fetchProducts(_currentPage),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return const Center(
@@ -341,6 +362,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     Expanded(
                       child: StaggeredGridView.countBuilder(
+                        controller: scrolController,
                         padding: const EdgeInsets.all(5),
                         staggeredTileBuilder: (index) {
                           return StaggeredTile.count(

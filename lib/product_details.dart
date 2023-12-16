@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
+// ignore: depend_on_referenced_packages
 import 'package:html/parser.dart' as htmlparser;
 import 'package:perfume_hub_app/product_chart.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -71,7 +73,6 @@ class _ProductDetailsState extends State<ProductDetails> {
       );
       variantsTitle.add(variantTitle);
     });
-    print(variantsTitle);
   }
 
   void getProductOffers(document) {
