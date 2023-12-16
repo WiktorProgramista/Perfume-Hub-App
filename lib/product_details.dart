@@ -8,9 +8,9 @@ import 'package:perfume_hub_app/product_chart.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetails extends StatefulWidget {
-  final Map<String, dynamic> object;
+  final String? productURL;
 
-  const ProductDetails({Key? key, required this.object}) : super(key: key);
+  const ProductDetails({this.productURL, Key? key}) : super(key: key);
 
   @override
   State<ProductDetails> createState() => _ProductDetailsState();
@@ -33,8 +33,8 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   Future<void> fetchData() async {
     if (!isLoaded) {
-      await fetchAPIData(widget.object);
-      await fetchProductInfo(widget.object);
+      //await fetchAPIData(widget.object);
+      await fetchProductInfo(widget.productURL);
       setState(() {
         isLoaded = true;
       });
@@ -107,10 +107,10 @@ class _ProductDetailsState extends State<ProductDetails> {
     });
   }
 
-  Future<void> fetchProductInfo(obj) async {
+  Future<void> fetchProductInfo(productURL) async {
     variantsTitle = [];
     final response =
-        await http.get(Uri.parse('https://perfumehub.pl${obj['productLink']}'));
+        await http.get(Uri.parse('https://perfumehub.pl${widget.productURL}'));
 
     if (response.statusCode == 200) {
       final document = htmlparser.parse(response.body);

@@ -21,6 +21,7 @@ class Product {
   final String imageUrl;
   final String price;
   final String priceChange;
+  final String productLink;
 
   Product({
     required this.title,
@@ -28,6 +29,7 @@ class Product {
     required this.imageUrl,
     required this.price,
     required this.priceChange,
+    required this.productLink,
   });
 }
 
@@ -87,6 +89,9 @@ class _HomeScreenState extends State<HomeScreen> {
         var imageElement = element.querySelector('.image-container img');
         var priceElement = element.querySelector('.price');
         var priceChangeElement = element.querySelector('span');
+        var productLink = element
+            .getElementsByClassName('d-block h-100')[0]
+            .attributes['href'];
 
         final product = Product(
           title: titleElement?.text.trim() ?? '',
@@ -94,6 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
           imageUrl: imageElement?.attributes['src'] ?? '',
           price: priceElement?.text.trim() ?? '',
           priceChange: priceChangeElement?.text.trim() ?? '',
+          productLink: productLink ?? '',
         );
 
         products.add(product);
@@ -187,58 +193,68 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildPerfumeContainer(int index) {
     final product = products[index];
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            spreadRadius: 5,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(product.priceChange),
-          SizedBox(
-            width: 150,
-            height: 150,
-            child: Image.network(
-              product.imageUrl.isNotEmpty
-                  ? product.imageUrl
-                  : 'https://i.notino.com/detail_thumb/4711/471oriu_aedc08_03/4711-original-woda-kolonska-bez-atomizera-unisex___117.jpg',
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProductDetails(
+                      productURL: product.productLink,
+                    )));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              spreadRadius: 5,
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Column(
-              children: [
-                Text(
-                  product.title,
-                  style: TextStyle(
-                    fontSize: product.title.length < 20 ? 18 : 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  product.subtitle,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w300,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                _buildPriceText(product.price),
-              ],
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(product.priceChange),
+            SizedBox(
+              width: 150,
+              height: 150,
+              child: Image.network(
+                product.imageUrl.isNotEmpty
+                    ? product.imageUrl
+                    : 'https://i.notino.com/detail_thumb/4711/471oriu_aedc08_03/4711-original-woda-kolonska-bez-atomizera-unisex___117.jpg',
+              ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Column(
+                children: [
+                  Text(
+                    product.title,
+                    style: TextStyle(
+                      fontSize: product.title.length < 20 ? 18 : 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    product.subtitle,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w300,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  _buildPriceText(product.price),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -302,11 +318,12 @@ class _HomeScreenState extends State<HomeScreen> {
             (element) => element.containsValue(selectedValue),
             orElse: () => <String, dynamic>{},
           );
+          print(selectedObject['productLink']);
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      ProductDetails(object: selectedObject)));
+                  builder: (context) => ProductDetails(
+                      productURL: selectedObject['productLink'])));
         },
         fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
           return TextField(
