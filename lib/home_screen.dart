@@ -53,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final scrolController = ScrollController();
   int _currentPage = 1;
   bool isLoading = false;
+  final defaultImage = "https://perfumehub.pl/images/default_image.jpg";
 
   @override
   void initState() {
@@ -209,13 +210,17 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(product.priceChange),
             SizedBox(
-              width: 150,
-              height: 150,
-              child: Image.network(
-                  errorBuilder: (context, child, loadingProgress) {
-                return const CircularProgressIndicator(strokeWidth: 1);
-              }, product.imageUrl),
-            ),
+                width: 150,
+                height: 150,
+                child: !isLoading
+                    ? Image.network(
+                        product.imageUrl,
+                        errorBuilder: (BuildContext context, Object error,
+                            StackTrace? stackTrace) {
+                          return Image.network(defaultImage);
+                        },
+                      )
+                    : const CircularProgressIndicator(strokeWidth: 1.0)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Column(
