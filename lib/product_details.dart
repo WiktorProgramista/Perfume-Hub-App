@@ -146,14 +146,13 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   String decodeUrl(String encodedUrl) {
     Uri parsedUrl = Uri.parse(encodedUrl);
-    String decodedUrl = "";
+    String decodedUrl = Uri.decodeFull(parsedUrl.queryParameters['url'] ?? "");
     if (encodedUrl.contains('click?')) {
-      decodedUrl = Uri.decodeFull(parsedUrl.queryParameters['url'] ?? "");
       decodedUrl = decodedUrl.split(':///click?')[0];
     } else {
       decodedUrl = encodedUrl;
     }
-    return parsedUrl.toString();
+    return decodedUrl;
   }
 
   @override
