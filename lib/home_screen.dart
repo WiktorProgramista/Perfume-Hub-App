@@ -301,10 +301,6 @@ class _HomeScreenState extends State<HomeScreen> {
               .map<String>((data) => "${data['brand']}-${data['line']}");
         },
         onSelected: (String selectedValue) {
-          var selectedObject = filteredData.firstWhere(
-            (element) => element.containsValue(selectedValue),
-            orElse: () => <String, dynamic>{},
-          );
           var foundedProduct = responseData
               .where((e) => '${e['brand']}-${e['line']}' == selectedValue)
               .first;
