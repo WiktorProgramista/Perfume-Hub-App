@@ -318,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
             (element) => element.containsValue(selectedValue),
             orElse: () => <String, dynamic>{},
           );
-          print(selectedObject['productLink']);
+          //print(selectedObject['productLink']);
           Navigator.push(
               context,
               MaterialPageRoute(

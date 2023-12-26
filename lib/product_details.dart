@@ -94,15 +94,27 @@ class _ProductDetailsState extends State<ProductDetails> {
           .getElementsByClassName(
               'col-6 col-md-3 order-4 order-md-4 px-0 text-end price')
           .first
-          .text;
+          .text
+          .toString()
+          .trim()
+          .split('\n')[0];
+      var pricePerMl = element
+          .getElementsByClassName(
+              'col-6 col-md-3 order-4 order-md-4 px-0 text-end price')
+          .first
+          .text
+          .toString()
+          .trim()
+          .split('\n')[1];
       var shopUrl =
           element.getElementsByClassName('btn-go-to').first.attributes['href'];
 
       final offer = Offers(
-          shopName: shopName.trim() ?? '',
-          productName: productName.trim() ?? '',
-          price: price.trim() ?? '',
-          shopUrl: shopUrl.trim());
+          shopName: shopName.trim(),
+          productName: productName.trim(),
+          price: price.trim(),
+          shopUrl: shopUrl.trim(),
+          pricePerMl: pricePerMl.trim());
       offers.add(offer);
     });
   }
@@ -174,11 +186,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                     color: Colors.white,
                     child: Center(
                       child: Container(
-                        height: 200,
-                        width: 200,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
                             image: NetworkImage(productImage),
                           ),
                         ),
@@ -187,9 +197,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         productTitle,
+                        textAlign: TextAlign.center,
                         style: const TextStyle(
                             fontSize: 25, fontWeight: FontWeight.w800),
                       ),
@@ -225,10 +237,22 @@ class _ProductDetailsState extends State<ProductDetails> {
             onTap: () => openURL(offer.shopUrl),
             title: Text(
               offer.productName,
+              textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
-            subtitle: Text(offer.shopUrl),
-            trailing: Text(offer.price),
+            //subtitle: Text(offer.shopUrl),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(offer.price,
+                    style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold)),
+                Text(offer.pricePerMl),
+              ],
+            ),
             dense: true,
           ),
         );
@@ -278,11 +302,12 @@ class Offers {
   final String productName;
   final String price;
   final String shopUrl;
+  final String pricePerMl;
 
-  Offers({
-    required this.shopName,
-    required this.productName,
-    required this.price,
-    required this.shopUrl,
-  });
+  Offers(
+      {required this.shopName,
+      required this.productName,
+      required this.price,
+      required this.shopUrl,
+      required this.pricePerMl});
 }
