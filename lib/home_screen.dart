@@ -138,18 +138,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _filterData(String text) {
-    filteredData = responseData
-        .where((item) =>
-            (item['brand']?.toLowerCase().contains(text.toLowerCase()) ??
-                false) ||
-            (item['line']?.toLowerCase().contains(text.toLowerCase()) ??
-                false) ||
-            (item['productLink']?.toLowerCase().contains(text.toLowerCase()) ??
-                false))
-        .toList();
-  }
-
   Widget _buildHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -224,10 +212,9 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 150,
               height: 150,
               child: Image.network(
-                product.imageUrl.isNotEmpty
-                    ? product.imageUrl
-                    : 'https://i.notino.com/detail_thumb/4711/471oriu_aedc08_03/4711-original-woda-kolonska-bez-atomizera-unisex___117.jpg',
-              ),
+                  errorBuilder: (context, child, loadingProgress) {
+                return const CircularProgressIndicator(strokeWidth: 1);
+              }, product.imageUrl),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -310,8 +297,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Autocomplete<String>(
         optionsBuilder: (TextEditingValue textEditingValue) {
           _headerTypeSearch(textEditingValue.text);
-          _filterData(textEditingValue.text);
-          return responseData.map<String>((data) => data['line']).toList();
+          return responseData
+              .map<String>((data) => "${data['brand']}-${data['line']})");
         },
         onSelected: (String selectedValue) {
           var selectedObject = filteredData.firstWhere(
@@ -383,7 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.all(5),
                         staggeredTileBuilder: (index) {
                           return StaggeredTile.count(
-                              1, index.isEven ? 2.0 : 2.3);
+                              1, index.isEven ? 2.2 : 2.3);
                         },
                         crossAxisCount: 2,
                         crossAxisSpacing: 10,
