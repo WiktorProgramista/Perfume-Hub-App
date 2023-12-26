@@ -298,7 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
         optionsBuilder: (TextEditingValue textEditingValue) {
           _headerTypeSearch(textEditingValue.text);
           return responseData
-              .map<String>((data) => "${data['brand']}-${data['line']})");
+              .map<String>((data) => "${data['brand']}-${data['line']}");
         },
         onSelected: (String selectedValue) {
           var selectedObject = filteredData.firstWhere(
