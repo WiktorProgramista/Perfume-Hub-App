@@ -29,7 +29,6 @@ class _ProductDetailsState extends State<ProductDetails> {
   void initState() {
     super.initState();
     fetchData();
-    print('aaaaa ${widget.productURL}');
   }
 
   Future<void> fetchData() async {
@@ -147,11 +146,14 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   String decodeUrl(String encodedUrl) {
     Uri parsedUrl = Uri.parse(encodedUrl);
-    String decodedUrl = Uri.decodeFull(parsedUrl.queryParameters['url'] ?? "");
-    if (decodedUrl.contains('click?')) {
+    String decodedUrl = "";
+    if (encodedUrl.contains('click?')) {
+      decodedUrl = Uri.decodeFull(parsedUrl.queryParameters['url'] ?? "");
       decodedUrl = decodedUrl.split(':///click?')[0];
+    } else {
+      decodedUrl = encodedUrl;
     }
-    return decodedUrl;
+    return parsedUrl.toString();
   }
 
   @override
