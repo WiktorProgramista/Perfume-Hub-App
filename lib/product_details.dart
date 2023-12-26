@@ -29,6 +29,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   void initState() {
     super.initState();
     fetchData();
+    print('aaaaa ${widget.productURL}');
   }
 
   Future<void> fetchData() async {
@@ -123,7 +124,6 @@ class _ProductDetailsState extends State<ProductDetails> {
     variantsTitle = [];
     final response =
         await http.get(Uri.parse('https://perfumehub.pl${widget.productURL}'));
-
     if (response.statusCode == 200) {
       final document = htmlparser.parse(response.body);
       productImage =

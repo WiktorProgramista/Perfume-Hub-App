@@ -305,12 +305,14 @@ class _HomeScreenState extends State<HomeScreen> {
             (element) => element.containsValue(selectedValue),
             orElse: () => <String, dynamic>{},
           );
-          //print(selectedObject['productLink']);
+          var foundedProduct = responseData
+              .where((e) => '${e['brand']}-${e['line']}' == selectedValue)
+              .first;
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => ProductDetails(
-                      productURL: selectedObject['productLink'])));
+                      productURL: foundedProduct['productLink'])));
         },
         fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
           return TextField(
