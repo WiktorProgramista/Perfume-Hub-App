@@ -20,6 +20,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   List<dynamic> priceData = [];
   List<VariantTitle> variantsTitle = [];
   List<Offers> offers = [];
+  List<TypeLink> typeLinks = [];
   String productImage = '';
   String productTitle = '';
   String productSubtitle = '';
@@ -119,6 +120,20 @@ class _ProductDetailsState extends State<ProductDetails> {
     });
   }
 
+  void getProductTypes(document) {
+    final elements = document.getElementsByClassName('type-link');
+
+    elements.forEach((element) {
+      var title = element.text;
+      var url = element.attributes['href'];
+      final typeLink = TypeLink(
+        title: title ?? '',
+        url: url ?? '',
+      );
+      typeLinks.add(typeLink);
+    });
+  }
+
   Future<void> fetchProductInfo(productURL) async {
     variantsTitle = [];
     final response =
@@ -135,6 +150,7 @@ class _ProductDetailsState extends State<ProductDetails> {
 
       getProductCapacities(document);
       getProductOffers(document);
+      getProductTypes(document);
     }
   }
 
@@ -223,6 +239,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                     ],
                   ),
                   const SizedBox(height: 10),
+                  productTypes(typeLinks),
+                  const SizedBox(height: 10),
+                  const Divider(),
+                  const SizedBox(height: 10),
                   fragranceCapacity(variantsTitle),
                   const SizedBox(height: 10),
                   siteContainer(),
@@ -280,13 +300,44 @@ class _ProductDetailsState extends State<ProductDetails> {
           width: 100,
           height: 80,
           padding: const EdgeInsets.all(5.0),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey, width: 2),
-          ),
+          decoration: BoxDecoration(color: Colors.grey.withOpacity(0.2)),
           child: Center(
             child: Text(
               variant.title,
               textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget productTypes(List<TypeLink> typeLinks) {
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      alignment: WrapAlignment.spaceEvenly,
+      runSpacing: 5,
+      children: typeLinks.map((type) {
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ProductDetails(productURL: type.url)));
+          },
+          child: Container(
+            width: 100,
+            height: 80,
+            padding: const EdgeInsets.all(5.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 1),
+            ),
+            child: Center(
+              child: Text(
+                type.title,
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         );
@@ -320,4 +371,11 @@ class Offers {
       required this.price,
       required this.shopUrl,
       required this.pricePerMl});
+}
+
+class TypeLink {
+  final String title;
+  final String url;
+
+  TypeLink({required this.title, required this.url});
 }
