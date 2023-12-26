@@ -113,7 +113,7 @@ class _ProductDetailsState extends State<ProductDetails> {
           shopName: shopName.trim(),
           productName: productName.trim(),
           price: price.trim(),
-          shopUrl: shopUrl.trim(),
+          shopUrl: decodeUrl(shopUrl),
           pricePerMl: pricePerMl.trim());
       offers.add(offer);
     });
@@ -143,6 +143,15 @@ class _ProductDetailsState extends State<ProductDetails> {
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     }
+  }
+
+  String decodeUrl(String encodedUrl) {
+    Uri parsedUrl = Uri.parse(encodedUrl);
+    String decodedUrl = Uri.decodeFull(parsedUrl.queryParameters['url'] ?? "");
+    if (decodedUrl.contains('click?')) {
+      decodedUrl = decodedUrl.split(':///click?')[0];
+    }
+    return decodedUrl;
   }
 
   @override
@@ -240,7 +249,7 @@ class _ProductDetailsState extends State<ProductDetails> {
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
-            //subtitle: Text(offer.shopUrl),
+            subtitle: Text(offer.shopUrl),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
