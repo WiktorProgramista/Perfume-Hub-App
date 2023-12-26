@@ -2,7 +2,16 @@ import 'package:flutter/material.dart';
 
 class MultiSelect extends StatefulWidget {
   final List<String> items;
-  const MultiSelect({Key? key, required this.items}) : super(key: key);
+  final Set<String> selectedProducts;
+  final String url;
+  final Function(String) onChangedUrl;
+  const MultiSelect(
+      {Key? key,
+      required this.items,
+      required this.selectedProducts,
+      required this.url,
+      required this.onChangedUrl})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MultiSelectState();
@@ -11,6 +20,12 @@ class MultiSelect extends StatefulWidget {
 class _MultiSelectState extends State<MultiSelect> {
   final List<String> _selectedItems = [];
 
+  @override
+  void initState() {
+    super.initState();
+    _selectedItems.addAll(widget.selectedProducts);
+  }
+
   void _itemChange(String itemValue, bool isSelected) {
     setState(() {
       if (isSelected) {
@@ -18,15 +33,9 @@ class _MultiSelectState extends State<MultiSelect> {
       } else {
         _selectedItems.remove(itemValue);
       }
+      widget.onChangedUrl('?tester=true');
+      Navigator.of(context).pop(_selectedItems.toSet());
     });
-  }
-
-  void _cancel() {
-    Navigator.pop(context);
-  }
-
-  void _submit() {
-    Navigator.pop(context, _selectedItems);
   }
 
   @override
@@ -45,16 +54,6 @@ class _MultiSelectState extends State<MultiSelect> {
               .toList(),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: _cancel,
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: _submit,
-          child: const Text('Submit'),
-        ),
-      ],
     );
   }
 }

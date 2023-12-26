@@ -48,12 +48,14 @@ class _HomeScreenState extends State<HomeScreen> {
     'nie zestaw'
   ];
   List<Map<String, dynamic>> responseData = [];
-  List filteredData = [];
   List<Product> products = [];
   final scrolController = ScrollController();
   int _currentPage = 1;
   bool isLoading = false;
   final defaultImage = "https://perfumehub.pl/images/default_image.jpg";
+  var url = "https://perfumehub.pl/";
+
+  final Set<String> _selectedTypProduktu = <String>{};
 
   @override
   void initState() {
@@ -77,8 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchProducts(int page) async {
-    final response =
-        await http.get(Uri.parse('https://perfumehub.pl/?page=$page'));
+    var newUrl = "$url&page=$_currentPage";
+    final response = await http.get(Uri.parse(url));
+    print(newUrl);
     if (response.statusCode == 200) {
       final document = htmlparser.parse(response.body);
       final elements =
@@ -119,7 +122,6 @@ class _HomeScreenState extends State<HomeScreen> {
       final Map<String, dynamic> data = json.decode(response.body);
       setState(() {
         responseData = List<Map<String, dynamic>>.from(data['products']);
-        //print(responseData.toString());
       });
     } else {
       throw Exception('Request API error');
@@ -127,15 +129,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showMultiSelect(List<String> items) async {
-    final List<String>? results = await showDialog(
+    final Set<String>? results = await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return MultiSelect(items: items);
+        return MultiSelect(
+            items: items,
+            selectedProducts: _selectedTypProduktu,
+            url: url,
+            onChangedUrl: (newUrl) {
+              setState(() {
+                url += newUrl;
+                responseData = [];
+                products = [];
+              });
+            });
       },
     );
 
     if (results != null) {
-      setState(() {});
+      setState(() {
+        _selectedTypProduktu.clear();
+        _selectedTypProduktu.addAll(results);
+      });
     }
   }
 
@@ -185,11 +200,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return InkWell(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ProductDetails(
-                      productURL: product.productLink,
-                    )));
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetails(
+              productURL: product.productLink,
+            ),
+          ),
+        );
       },
       child: Container(
         decoration: BoxDecoration(
@@ -210,17 +227,18 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(product.priceChange),
             SizedBox(
-                width: 150,
-                height: 150,
-                child: !isLoading
-                    ? Image.network(
-                        product.imageUrl,
-                        errorBuilder: (BuildContext context, Object error,
-                            StackTrace? stackTrace) {
-                          return Image.network(defaultImage);
-                        },
-                      )
-                    : const CircularProgressIndicator(strokeWidth: 1.0)),
+              width: 150,
+              height: 150,
+              child: !isLoading
+                  ? Image.network(
+                      product.imageUrl,
+                      errorBuilder: (BuildContext context, Object error,
+                          StackTrace? stackTrace) {
+                        return Image.network(defaultImage);
+                      },
+                    )
+                  : const CircularProgressIndicator(strokeWidth: 1.0),
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Column(
@@ -310,10 +328,12 @@ class _HomeScreenState extends State<HomeScreen> {
               .where((e) => '${e['brand']}-${e['line']}' == selectedValue)
               .first;
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ProductDetails(
-                      productURL: foundedProduct['productLink'])));
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  ProductDetails(productURL: foundedProduct['productLink']),
+            ),
+          );
         },
         fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
           return TextField(
