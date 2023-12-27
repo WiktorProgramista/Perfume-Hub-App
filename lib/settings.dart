@@ -14,29 +14,42 @@ class Settings extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Ustawienia',
                       style:
                           TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-                  Consumer<ThemeProvider>(
-                    builder: (context, provider, child) {
-                      return DropdownButton<String>(
-                        value: provider.currentTheme,
-                        items: const [
-                          DropdownMenuItem<String>(
-                              value: "light", child: Text("Jasny")),
-                          DropdownMenuItem<String>(
-                              value: "dark", child: Text("Ciemny")),
-                          DropdownMenuItem<String>(
-                              value: "system", child: Text("Systemowy")),
-                        ],
-                        onChanged: (String? value) {
-                          provider.changeTheme(value ?? "system");
-                        },
-                      );
-                    },
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Motyw aplikacji",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w400),
+                        ),
+                        Consumer<ThemeProvider>(
+                          builder: (context, provider, child) {
+                            return DropdownButton<String>(
+                              value: provider.currentTheme,
+                              items: const [
+                                DropdownMenuItem<String>(
+                                    value: "light", child: Text("Jasny")),
+                                DropdownMenuItem<String>(
+                                    value: "dark", child: Text("Ciemny")),
+                                DropdownMenuItem<String>(
+                                    value: "system", child: Text("Systemowy")),
+                              ],
+                              onChanged: (String? value) {
+                                provider.changeTheme(value ?? "system");
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   )
                 ],
               ),
