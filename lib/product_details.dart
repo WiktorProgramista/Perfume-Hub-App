@@ -34,7 +34,6 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   Future<void> fetchData() async {
     if (!isLoaded) {
-      //await fetchAPIData(widget.object);
       await fetchProductInfo(widget.productURL);
       setState(() {
         isLoaded = true;
@@ -174,38 +173,41 @@ class _ProductDetailsState extends State<ProductDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: InkWell(
+          child: const Icon(Icons.arrow_back),
+          onTap: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          InkWell(
+            child: const Icon(Icons.favorite_border_outlined),
+            onTap: () {
+              if (isLoaded) {}
+            },
+          ),
+          const SizedBox(width: 20),
+          InkWell(
+            child: const Icon(Icons.bar_chart),
+            onTap: () {
+              if (isLoaded) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductChart(data: priceData),
+                  ),
+                );
+              }
+            },
+          ),
+          const SizedBox(width: 10),
+        ],
+      ),
       body: isLoaded
           ? SafeArea(
               child: ListView(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                          child: const Icon(Icons.arrow_back),
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                        InkWell(
-                          child: const Icon(Icons.bar_chart),
-                          onTap: () {
-                            if (isLoaded) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ProductChart(data: priceData),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
                   Container(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.height / 2.8,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:perfume_hub_app/home_screen.dart';
 import 'package:perfume_hub_app/product_details.dart';
+import 'package:perfume_hub_app/saved_products.dart';
 import 'package:perfume_hub_app/settings.dart';
 
 class BottomNavigation extends StatefulWidget {
@@ -14,7 +15,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
   List<Widget> pages = [
     const HomeScreen(),
     const ProductDetails(),
-    const HomeScreen(),
+    const SavedProducts(),
     const Settings()
   ];
   int currentIndex = 0;
@@ -58,8 +59,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Colors.black,
-                  icon: Icon(Icons.home),
-                  label: 'Home',
+                  icon: Icon(Icons.favorite),
+                  label: 'Favourite',
                 ),
                 BottomNavigationBarItem(
                   backgroundColor: Colors.black,
