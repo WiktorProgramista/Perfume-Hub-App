@@ -10,12 +10,6 @@ import 'package:perfume_hub_app/multi_select.dart';
 import 'package:perfume_hub_app/objects/product.dart';
 import 'package:perfume_hub_app/product_details.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    home: HomeScreen(),
-  ));
-}
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -223,15 +217,29 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(
               width: 150,
               height: 150,
-              child: !isLoading
-                  ? Image.network(
-                      product.imageUrl,
-                      errorBuilder: (BuildContext context, Object error,
-                          StackTrace? stackTrace) {
-                        return Image.network(defaultImage);
-                      },
-                    )
-                  : const CircularProgressIndicator(strokeWidth: 1.0),
+              child: Image.network(
+                product.imageUrl,
+                loadingBuilder: (BuildContext context, Widget child,
+                    ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child; // Obraz został wczytany, zwróć go
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
+                      ),
+                    );
+                  }
+                },
+                errorBuilder: (BuildContext context, Object error,
+                    StackTrace? stackTrace) {
+                  return Image.network(
+                      defaultImage); // Zwróć domyślny obraz w przypadku błędu
+                },
+              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
