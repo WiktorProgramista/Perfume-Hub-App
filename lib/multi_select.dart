@@ -110,7 +110,8 @@ class _MultiSelectState extends State<MultiSelect> {
                     });
                   },
                   decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(),
+                    border: InputBorder.none,
                     hintText: "Od",
                   ),
                 ),
@@ -128,7 +129,8 @@ class _MultiSelectState extends State<MultiSelect> {
                     });
                   },
                   decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(),
+                    border: InputBorder.none,
                     hintText: "Do",
                   ),
                 ),
