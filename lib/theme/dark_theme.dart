@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 ThemeData darkTheme = ThemeData(
+  checkboxTheme: CheckboxThemeData(checkColor:
+      MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+    return Colors.orange;
+  })),
   brightness: Brightness.dark,
   primaryColor: Colors.white,
   colorScheme: ColorScheme.dark(

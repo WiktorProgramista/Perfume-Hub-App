@@ -35,6 +35,13 @@ class _MultiSelectState extends State<MultiSelect> {
     _endPrice.text = _selectedPrice['endPrice']!;
   }
 
+  Uri addQueryParameters(String originalUri, Map<dynamic, dynamic> newParams) {
+    return Uri.parse(originalUri).replace(queryParameters: {
+      ...Uri.parse(originalUri).queryParameters,
+      ...newParams,
+    });
+  }
+
   void _itemChange(String itemValue, bool isSelected) {
     setState(() {
       if (isSelected) {
@@ -49,7 +56,7 @@ class _MultiSelectState extends State<MultiSelect> {
   }
 
   String _setProductTypeURL(String type, String url) {
-    Map<String, String> queryParams;
+    Map<dynamic, dynamic> queryParams;
 
     switch (type) {
       case "tester":
@@ -68,7 +75,7 @@ class _MultiSelectState extends State<MultiSelect> {
         return url;
     }
 
-    return Uri.parse(url).replace(queryParameters: queryParams).toString();
+    return addQueryParameters(url, queryParams).toString();
   }
 
   @override
@@ -98,13 +105,8 @@ class _MultiSelectState extends State<MultiSelect> {
                     setState(() {
                       _selectedPrice["startPrice"] = startVal;
                       widget.onChangedUrlCallback(
-                        Uri.parse(widget.url).replace(
-                          queryParameters: {
-                            "price_from": startVal.toString(),
-                            "price_to": _selectedPrice["endPrice"],
-                          },
-                        ).toString(),
-                      );
+                          addQueryParameters(widget.url, _selectedPrice)
+                              .toString());
                     });
                   },
                   decoration: const InputDecoration(
@@ -121,13 +123,8 @@ class _MultiSelectState extends State<MultiSelect> {
                     setState(() {
                       _selectedPrice["endPrice"] = endVal;
                       widget.onChangedUrlCallback(
-                        Uri.parse(widget.url).replace(
-                          queryParameters: {
-                            "price_to": endVal.toString(),
-                            "price_from": _selectedPrice["startPrice"]
-                          },
-                        ).toString(),
-                      );
+                          addQueryParameters(widget.url, _selectedPrice)
+                              .toString());
                     });
                   },
                   decoration: const InputDecoration(
