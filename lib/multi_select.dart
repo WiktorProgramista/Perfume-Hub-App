@@ -101,7 +101,7 @@ class _MultiSelectState extends State<MultiSelect> {
                         Uri.parse(widget.url).replace(
                           queryParameters: {
                             "price_from": startVal.toString(),
-                            "price_to": _selectedPrice["endPrice"]
+                            "price_to": _selectedPrice["endPrice"],
                           },
                         ).toString(),
                       );
