@@ -56,6 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
   var url = "https://perfumehub.pl/";
 
   final Set<String> _selectedTypProduktu = <String>{};
+  final Map<String, String> _selectedPrice = {
+    "startPrice": "0",
+    "endPrice": "0"
+  };
 
   @override
   void initState() {
@@ -80,6 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> fetchProducts(int page) async {
     final response = await http.get(Uri.parse(url));
+    print(url);
     if (response.statusCode == 200) {
       final document = htmlparser.parse(response.body);
       final elements =
@@ -126,19 +131,21 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _showMultiSelect(List<String> items) async {
+  void _showMultiSelect(
+      List<String> items, Map<String, String> selectedPrice) async {
     final Set<String>? results = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return MultiSelect(
             items: items,
             selectedProducts: _selectedTypProduktu,
+            selectedPrice: selectedPrice,
             url: url,
-            onChangedUrl: (newUrl) {
+            onChangedUrlCallback: (newUrl) {
               setState(() {
-                url = newUrl;
                 responseData = [];
                 products = [];
+                url = newUrl;
               });
             });
       },
@@ -342,7 +349,7 @@ class _HomeScreenState extends State<HomeScreen> {
               hintText: 'Search here',
               prefixIcon: const Icon(Icons.search),
               suffixIcon: InkWell(
-                onTap: () => _showMultiSelect(_typProduktu),
+                onTap: () => _showMultiSelect(_typProduktu, _selectedPrice),
                 child: const Icon(Icons.filter_list),
               ),
               border: InputBorder.none,
