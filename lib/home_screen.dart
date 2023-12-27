@@ -1,10 +1,14 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+// ignore: depend_on_referenced_packages
+import 'package:http/http.dart' as http;
+// ignore: depend_on_referenced_packages
+import 'package:html/parser.dart' as htmlparser;
 import 'package:perfume_hub_app/multi_select.dart';
 import 'package:perfume_hub_app/objects/product.dart';
 import 'package:perfume_hub_app/product_details.dart';
-import 'package:perfume_hub_app/services/network_service.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -33,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = false;
   final defaultImage = "https://perfumehub.pl/images/default_image.jpg";
   var url = "https://perfumehub.pl/";
-  NetworkService networkService = NetworkService();
+
   final Set<String> _selectedTypProduktu = <String>{};
   final Map<String, String> _selectedPrice = {
     "price_from": "0",
@@ -44,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     scrolController.addListener(_scrollListener);
-    networkService.fetchProducts(url, _currentPage, products);
+    fetchProducts(1);
   }
 
   Future<void> _scrollListener() async {
@@ -54,10 +58,65 @@ class _HomeScreenState extends State<HomeScreen> {
         isLoading = true;
       });
       _currentPage++;
-      await networkService.fetchProducts(url, _currentPage, products);
+      await fetchProducts(_currentPage);
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Uri addQueryParameters(String originalUri, Map<dynamic, dynamic> newParams) {
+    return Uri.parse(originalUri).replace(queryParameters: {
+      ...Uri.parse(originalUri).queryParameters,
+      ...newParams,
+    });
+  }
+
+  Future<void> fetchProducts(int page) async {
+    final response = await http.get(Uri.parse(url));
+    url = addQueryParameters(url, {"page": _currentPage.toString()}).toString();
+    if (response.statusCode == 200) {
+      final document = htmlparser.parse(response.body);
+      final elements =
+          document.getElementsByClassName('col-6 col-md-4 col-lg-3');
+
+      for (var element in elements) {
+        var titleElement = element.querySelector('.card-title');
+        var subtitleElement = element.querySelector('.card-subtitle');
+        var imageElement = element.querySelector('.image-container img');
+        var priceElement = element.querySelector('.price');
+        var priceChangeElement = element.querySelector('span');
+        var productLink = element
+            .getElementsByClassName('d-block h-100')[0]
+            .attributes['href'];
+
+        final product = Product(
+          title: titleElement?.text.trim() ?? '',
+          subtitle: subtitleElement?.text.trim() ?? '',
+          imageUrl: imageElement?.attributes['src'] ?? '',
+          price: priceElement?.text.trim() ?? '',
+          priceChange: priceChangeElement?.text.trim() ?? '',
+          productLink: productLink ?? '',
+        );
+
+        products.add(product);
+      }
+    } else {
+      throw Exception('Request API error');
+    }
+  }
+
+  void _headerTypeSearch(String text) async {
+    final url = 'https://perfumehub.pl/typeahead?q=$text&t=1700922313025';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      setState(() {
+        responseData = List<Map<String, dynamic>>.from(data['products']);
+      });
+    } else {
+      throw Exception('Request API error');
     }
   }
 
@@ -247,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Autocomplete<String>(
         optionsBuilder: (TextEditingValue textEditingValue) {
-          networkService.headerTypeSearch(textEditingValue.text, responseData);
+          _headerTypeSearch(textEditingValue.text);
           return responseData
               .map<String>((data) => "${data['brand']}-${data['line']}");
         },
@@ -287,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-        future: networkService.fetchProducts(url, _currentPage, products),
+        future: fetchProducts(_currentPage),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return const Center(

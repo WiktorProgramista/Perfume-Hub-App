@@ -6,6 +6,10 @@ import 'package:html/parser.dart' as htmlparser;
 import 'package:perfume_hub_app/objects/product.dart';
 
 class NetworkService {
+  /*
+   --> home_screen.dart
+  */
+
   Uri addQueryParameters(String originalUri, Map<dynamic, dynamic> newParams) {
     return Uri.parse(originalUri).replace(queryParameters: {
       ...Uri.parse(originalUri).queryParameters,
@@ -58,4 +62,8 @@ class NetworkService {
       throw Exception('Request API error');
     }
   }
+
+  /*
+    home_screen.dart <--
+  */
 }
