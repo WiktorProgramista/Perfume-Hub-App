@@ -79,9 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchProducts(int page) async {
-    var newUrl = "$url&page=$_currentPage";
     final response = await http.get(Uri.parse(url));
-    print(newUrl);
     if (response.statusCode == 200) {
       final document = htmlparser.parse(response.body);
       final elements =
