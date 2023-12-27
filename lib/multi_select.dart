@@ -33,9 +33,32 @@ class _MultiSelectState extends State<MultiSelect> {
       } else {
         _selectedItems.remove(itemValue);
       }
-      widget.onChangedUrl('?tester=true');
+      widget.onChangedUrl(_setProductTypeURL(itemValue, widget.url));
       Navigator.of(context).pop(_selectedItems.toSet());
     });
+  }
+
+  String _setProductTypeURL(String type, String url) {
+    Map<String, String> queryParams;
+
+    switch (type) {
+      case "tester":
+        queryParams = {"tester": "true"};
+        break;
+      case "nie tester":
+        queryParams = {"ntester": "true"};
+        break;
+      case "zestaw":
+        queryParams = {"is_set": "true"};
+        break;
+      case "nie zestaw":
+        queryParams = {"is_nset": "true"};
+        break;
+      default:
+        return url;
+    }
+
+    return Uri.parse(url).replace(queryParameters: queryParams).toString();
   }
 
   @override

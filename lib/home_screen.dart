@@ -138,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
             url: url,
             onChangedUrl: (newUrl) {
               setState(() {
-                url += newUrl;
+                url = newUrl;
                 responseData = [];
                 products = [];
               });
