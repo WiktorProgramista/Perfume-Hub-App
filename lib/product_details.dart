@@ -260,7 +260,7 @@ class _ProductDetailsState extends State<ProductDetails> {
       children: offers.map((offer) {
         return Card(
           elevation: 1,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.primary,
           shadowColor: Colors.white,
           surfaceTintColor: Colors.white,
           child: ListTile(

@@ -165,16 +165,16 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         const Icon(Icons.sort, size: 33),
         RichText(
-          text: const TextSpan(children: [
+          text: TextSpan(children: [
             TextSpan(
               text: 'Perfume',
               style: TextStyle(
-                color: Colors.black,
+                color: Theme.of(context).primaryColor,
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            TextSpan(
+            const TextSpan(
               text: 'Hub',
               style: TextStyle(
                 color: Colors.red,
@@ -216,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.secondary,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -278,28 +278,20 @@ class _HomeScreenState extends State<HomeScreen> {
     return RichText(
       text: TextSpan(
         children: [
-          const TextSpan(
-            text: 'od ',
+          TextSpan(
+            text: price,
             style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w300,
-              color: Colors.black,
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+              color: Theme.of(context).colorScheme.onSecondary,
             ),
           ),
           TextSpan(
-            text: price,
-            style: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w800,
-              color: Colors.black,
-            ),
-          ),
-          const TextSpan(
             text: ' zł',
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w300,
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.secondaryContainer,
             ),
           ),
         ],
@@ -312,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.secondary,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(

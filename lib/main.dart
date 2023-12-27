@@ -1,22 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:perfume_hub_app/bottom_navigation.dart';
+import 'package:perfume_hub_app/theme/dark_theme.dart';
+import 'package:perfume_hub_app/theme/light_theme.dart';
+import 'package:perfume_hub_app/theme_cubit.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  runApp(ChangeNotifierProvider<ThemeProvider>(
+    create: (_) => ThemeProvider()..initialize(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const BottomNavigation(),
+    return Consumer<ThemeProvider>(
+      builder: (context, provider, child) {
+        print(provider.currentTheme);
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          themeMode: provider.themeMode,
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          home: const BottomNavigation(),
+        );
+      },
     );
   }
 }

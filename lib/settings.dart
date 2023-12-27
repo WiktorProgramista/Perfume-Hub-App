@@ -1,28 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:perfume_hub_app/theme_cubit.dart';
+import 'package:provider/provider.dart';
 
-class Settings extends StatefulWidget {
+class Settings extends StatelessWidget {
   const Settings({super.key});
 
-  @override
-  State<Settings> createState() => _SettingsState();
-}
-
-class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          children: const [
+          children: [
             Padding(
-              padding: EdgeInsets.all(15.0),
+              padding: const EdgeInsets.all(15.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Ustawienia',
+                  const Text('Ustawienia',
                       style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
+                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+                  Consumer<ThemeProvider>(
+                    builder: (context, provider, child) {
+                      return DropdownButton<String>(
+                        value: provider.currentTheme,
+                        items: const [
+                          DropdownMenuItem<String>(
+                              value: "light", child: Text("Jasny")),
+                          DropdownMenuItem<String>(
+                              value: "dark", child: Text("Ciemny")),
+                          DropdownMenuItem<String>(
+                              value: "system", child: Text("Systemowy")),
+                        ],
+                        onChanged: (String? value) {
+                          provider.changeTheme(value ?? "system");
+                        },
+                      );
+                    },
+                  )
                 ],
               ),
             ),
