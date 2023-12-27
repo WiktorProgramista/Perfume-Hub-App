@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentPage = 1;
   final defaultImage = "https://perfumehub.pl/images/default_image.jpg";
   var url = "https://perfumehub.pl/";
-
+  bool isLoaded = false;
   final Set<String> _selectedTypProduktu = <String>{};
   final Map<String, String> _selectedPrice = {
     "price_from": "0",
@@ -86,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         setState(() {
           products.add(product);
+          isLoaded = true;
         });
       }
     } else {
@@ -346,46 +347,47 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 10.0),
-              _buildSearchBar(),
-              const SizedBox(height: 10.0),
-              const Text(
-                'Lista Produktów',
-                style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
+        body: isLoaded
+            ? SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(),
+                      const SizedBox(height: 10.0),
+                      _buildSearchBar(),
+                      const SizedBox(height: 10.0),
+                      const Text(
+                        'Lista Produktów',
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Expanded(
+                        child: StaggeredGridView.countBuilder(
+                          controller: scrolController,
+                          padding: const EdgeInsets.all(5),
+                          staggeredTileBuilder: (index) {
+                            return StaggeredTile.count(
+                              1,
+                              index.isEven ? 2.2 : 2.3,
+                            );
+                          },
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          itemCount: products.length,
+                          itemBuilder: (context, index) {
+                            return _buildPerfumeContainer(index);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: StaggeredGridView.countBuilder(
-                  controller: scrolController,
-                  padding: const EdgeInsets.all(5),
-                  staggeredTileBuilder: (index) {
-                    return StaggeredTile.count(
-                      1,
-                      index.isEven ? 2.2 : 2.3,
-                    );
-                  },
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    return _buildPerfumeContainer(index);
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+              )
+            : const Center(child: CircularProgressIndicator()));
   }
 }
