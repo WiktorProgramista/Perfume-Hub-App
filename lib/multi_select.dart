@@ -109,8 +109,10 @@ class _MultiSelectState extends State<MultiSelect> {
                               .toString());
                     });
                   },
-                  decoration: const InputDecoration(
-                    focusedBorder: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Theme.of(context).primaryColor)),
                     border: InputBorder.none,
                     hintText: "Od",
                   ),
@@ -128,8 +130,10 @@ class _MultiSelectState extends State<MultiSelect> {
                               .toString());
                     });
                   },
-                  decoration: const InputDecoration(
-                    focusedBorder: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Theme.of(context).primaryColor)),
                     border: InputBorder.none,
                     hintText: "Do",
                   ),
