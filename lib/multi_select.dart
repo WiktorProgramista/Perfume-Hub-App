@@ -99,6 +99,7 @@ class _MultiSelectState extends State<MultiSelect> {
             children: [
               Flexible(
                 child: TextField(
+                  cursorColor: Theme.of(context).primaryColor,
                   controller: _startPrice,
                   keyboardType: TextInputType.number,
                   onChanged: (startVal) {
@@ -120,6 +121,7 @@ class _MultiSelectState extends State<MultiSelect> {
               ),
               Flexible(
                 child: TextField(
+                  cursorColor: Theme.of(context).primaryColor,
                   controller: _endPrice,
                   keyboardType: TextInputType.number,
                   onChanged: (endVal) {
