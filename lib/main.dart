@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:perfume_hub_app/bottom_navigation.dart';
 import 'package:perfume_hub_app/theme/dark_theme.dart';
 import 'package:perfume_hub_app/theme/light_theme.dart';
-import 'package:perfume_hub_app/theme_cubit.dart';
+import 'package:perfume_hub_app/theme/theme_cubit.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
