@@ -57,8 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final Set<String> _selectedTypProduktu = <String>{};
   final Map<String, String> _selectedPrice = {
-    "startPrice": "0",
-    "endPrice": "0"
+    "price_from": "0",
+    "price_to": "0"
   };
 
   @override

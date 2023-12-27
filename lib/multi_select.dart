@@ -31,8 +31,8 @@ class _MultiSelectState extends State<MultiSelect> {
     super.initState();
     _selectedItems.addAll(widget.selectedProducts);
     _selectedPrice = widget.selectedPrice;
-    _startPrice.text = _selectedPrice['startPrice']!;
-    _endPrice.text = _selectedPrice['endPrice']!;
+    _startPrice.text = _selectedPrice['price_from']!;
+    _endPrice.text = _selectedPrice['price_to']!;
   }
 
   Uri addQueryParameters(String originalUri, Map<dynamic, dynamic> newParams) {
@@ -104,7 +104,7 @@ class _MultiSelectState extends State<MultiSelect> {
                   keyboardType: TextInputType.number,
                   onChanged: (startVal) {
                     setState(() {
-                      _selectedPrice["startPrice"] = startVal;
+                      _selectedPrice["price_from"] = startVal;
                       widget.onChangedUrlCallback(
                           addQueryParameters(widget.url, _selectedPrice)
                               .toString());
@@ -126,7 +126,7 @@ class _MultiSelectState extends State<MultiSelect> {
                   keyboardType: TextInputType.number,
                   onChanged: (endVal) {
                     setState(() {
-                      _selectedPrice["endPrice"] = endVal;
+                      _selectedPrice["price_to"] = endVal;
                       widget.onChangedUrlCallback(
                           addQueryParameters(widget.url, _selectedPrice)
                               .toString());
