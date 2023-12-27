@@ -61,62 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Uri addQueryParameters(String originalUri, Map<dynamic, dynamic> newParams) {
-  //   return Uri.parse(originalUri).replace(queryParameters: {
-  //     ...Uri.parse(originalUri).queryParameters,
-  //     ...newParams,
-  //   });
-  // }
-
-  // Future<void> fetchProducts(int page) async {
-  //   final response = await http.get(Uri.parse(url));
-  //   url = addQueryParameters(url, {"page": _currentPage.toString()}).toString();
-  //   print(url);
-  //   if (response.statusCode == 200) {
-  //     final document = htmlparser.parse(response.body);
-  //     final elements =
-  //         document.getElementsByClassName('col-6 col-md-4 col-lg-3');
-
-  //     for (var element in elements) {
-  //       var titleElement = element.querySelector('.card-title');
-  //       var subtitleElement = element.querySelector('.card-subtitle');
-  //       var imageElement = element.querySelector('.image-container img');
-  //       var priceElement = element.querySelector('.price');
-  //       var priceChangeElement = element.querySelector('span');
-  //       var productLink = element
-  //           .getElementsByClassName('d-block h-100')[0]
-  //           .attributes['href'];
-
-  //       final product = Product(
-  //         title: titleElement?.text.trim() ?? '',
-  //         subtitle: subtitleElement?.text.trim() ?? '',
-  //         imageUrl: imageElement?.attributes['src'] ?? '',
-  //         price: priceElement?.text.trim() ?? '',
-  //         priceChange: priceChangeElement?.text.trim() ?? '',
-  //         productLink: productLink ?? '',
-  //       );
-
-  //       products.add(product);
-  //     }
-  //   } else {
-  //     throw Exception('Request API error');
-  //   }
-  // }
-
-  // void _headerTypeSearch(String text) async {
-  //   final url = 'https://perfumehub.pl/typeahead?q=$text&t=1700922313025';
-  //   final response = await http.get(Uri.parse(url));
-
-  //   if (response.statusCode == 200) {
-  //     final Map<String, dynamic> data = json.decode(response.body);
-  //     setState(() {
-  //       responseData = List<Map<String, dynamic>>.from(data['products']);
-  //     });
-  //   } else {
-  //     throw Exception('Request API error');
-  //   }
-  // }
-
   void _showMultiSelect(
       List<String> items, Map<String, String> selectedPrice) async {
     final Set<String>? results = await showDialog(

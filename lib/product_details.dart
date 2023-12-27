@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 // ignore: depend_on_referenced_packages
 import 'package:html/parser.dart' as htmlparser;
+import 'package:perfume_hub_app/objects/offers.dart';
+import 'package:perfume_hub_app/objects/type_link.dart';
+import 'package:perfume_hub_app/objects/variant_title.dart';
 import 'package:perfume_hub_app/product_chart.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -346,38 +349,4 @@ class _ProductDetailsState extends State<ProductDetails> {
       }).toList(),
     );
   }
-}
-
-class VariantTitle {
-  final String title;
-  final String subtitle;
-  final String url;
-
-  VariantTitle({
-    required this.title,
-    required this.subtitle,
-    required this.url,
-  });
-}
-
-class Offers {
-  final String shopName;
-  final String productName;
-  final String price;
-  final String shopUrl;
-  final String pricePerMl;
-
-  Offers(
-      {required this.shopName,
-      required this.productName,
-      required this.price,
-      required this.shopUrl,
-      required this.pricePerMl});
-}
-
-class TypeLink {
-  final String title;
-  final String url;
-
-  TypeLink({required this.title, required this.url});
 }

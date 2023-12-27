@@ -16,7 +16,6 @@ class NetworkService {
   Future<void> fetchProducts(String url, int currentPage, List products) async {
     final response = await http.get(Uri.parse(url));
     url = addQueryParameters(url, {"page": currentPage.toString()}).toString();
-    print(url);
     if (response.statusCode == 200) {
       final document = htmlparser.parse(response.body);
       final elements =
