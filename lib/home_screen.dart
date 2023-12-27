@@ -1,10 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-// ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
-// ignore: depend_on_referenced_packages
 import 'package:html/parser.dart' as htmlparser;
 import 'package:perfume_hub_app/multi_select.dart';
 import 'package:perfume_hub_app/objects/product.dart';
@@ -28,7 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Product> products = [];
   final scrolController = ScrollController();
   int _currentPage = 1;
-  bool isLoading = false;
   final defaultImage = "https://perfumehub.pl/images/default_image.jpg";
   var url = "https://perfumehub.pl/";
 
@@ -42,20 +38,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     scrolController.addListener(_scrollListener);
-    fetchProducts(1);
+    fetchProducts(_currentPage);
   }
 
   Future<void> _scrollListener() async {
     if (scrolController.position.pixels ==
         scrolController.position.maxScrollExtent) {
-      setState(() {
-        isLoading = true;
-      });
       _currentPage++;
       await fetchProducts(_currentPage);
-      setState(() {
-        isLoading = false;
-      });
     }
   }
 
@@ -67,8 +57,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchProducts(int page) async {
+    print("fetch $page");
     final response = await http.get(Uri.parse(url));
-    url = addQueryParameters(url, {"page": _currentPage.toString()}).toString();
+    url = addQueryParameters(url, {"page": page.toString()}).toString();
     if (response.statusCode == 200) {
       final document = htmlparser.parse(response.body);
       final elements =
@@ -93,7 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
           productLink: productLink ?? '',
         );
 
-        products.add(product);
+        setState(() {
+          products.add(product);
+        });
       }
     } else {
       throw Exception('Request API error');
@@ -353,58 +346,45 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
-        future: fetchProducts(_currentPage),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else {
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(),
-                    const SizedBox(height: 10.0),
-                    _buildSearchBar(),
-                    const SizedBox(height: 10.0),
-                    const Text(
-                      'Lista Produktów',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Expanded(
-                      child: StaggeredGridView.countBuilder(
-                        controller: scrolController,
-                        padding: const EdgeInsets.all(5),
-                        staggeredTileBuilder: (index) {
-                          return StaggeredTile.count(
-                              1, index.isEven ? 2.2 : 2.3);
-                        },
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        itemCount: products.length,
-                        itemBuilder: (context, index) {
-                          return _buildPerfumeContainer(index);
-                        },
-                      ),
-                    ),
-                  ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 10.0),
+              _buildSearchBar(),
+              const SizedBox(height: 10.0),
+              const Text(
+                'Lista Produktów',
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            );
-          }
-        },
+              Expanded(
+                child: StaggeredGridView.countBuilder(
+                  controller: scrolController,
+                  padding: const EdgeInsets.all(5),
+                  staggeredTileBuilder: (index) {
+                    return StaggeredTile.count(
+                      1,
+                      index.isEven ? 2.2 : 2.3,
+                    );
+                  },
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    return _buildPerfumeContainer(index);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
