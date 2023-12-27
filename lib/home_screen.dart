@@ -7,8 +7,31 @@ import 'package:http/http.dart' as http;
 // ignore: depend_on_referenced_packages
 import 'package:html/parser.dart' as htmlparser;
 import 'package:perfume_hub_app/multi_select.dart';
-import 'package:perfume_hub_app/objects/product.dart';
 import 'package:perfume_hub_app/product_details.dart';
+
+void main() {
+  runApp(const MaterialApp(
+    home: HomeScreen(),
+  ));
+}
+
+class Product {
+  final String title;
+  final String subtitle;
+  final String imageUrl;
+  final String price;
+  final String priceChange;
+  final String productLink;
+
+  Product({
+    required this.title,
+    required this.subtitle,
+    required this.imageUrl,
+    required this.price,
+    required this.priceChange,
+    required this.productLink,
+  });
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -25,18 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
     'nie zestaw'
   ];
   List<Map<String, dynamic>> responseData = [];
+  List filteredData = [];
   List<Product> products = [];
   final scrolController = ScrollController();
   int _currentPage = 1;
   bool isLoading = false;
-  final defaultImage = "https://perfumehub.pl/images/default_image.jpg";
-  var url = "https://perfumehub.pl/";
-
-  final Set<String> _selectedTypProduktu = <String>{};
-  final Map<String, String> _selectedPrice = {
-    "price_from": "0",
-    "price_to": "0"
-  };
 
   @override
   void initState() {
@@ -59,16 +75,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Uri addQueryParameters(String originalUri, Map<dynamic, dynamic> newParams) {
-    return Uri.parse(originalUri).replace(queryParameters: {
-      ...Uri.parse(originalUri).queryParameters,
-      ...newParams,
-    });
-  }
-
   Future<void> fetchProducts(int page) async {
-    final response = await http.get(Uri.parse(url));
-    url = addQueryParameters(url, {"page": _currentPage.toString()}).toString();
+    final response =
+        await http.get(Uri.parse('https://perfumehub.pl/?page=$page'));
     if (response.statusCode == 200) {
       final document = htmlparser.parse(response.body);
       final elements =
@@ -102,44 +111,43 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _headerTypeSearch(String text) async {
     final url = 'https://perfumehub.pl/typeahead?q=$text&t=1700922313025';
+
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       setState(() {
         responseData = List<Map<String, dynamic>>.from(data['products']);
+        //print(responseData.toString());
       });
     } else {
       throw Exception('Request API error');
     }
   }
 
-  void _showMultiSelect(
-      List<String> items, Map<String, String> selectedPrice) async {
-    final Set<String>? results = await showDialog(
+  void _showMultiSelect(List<String> items) async {
+    final List<String>? results = await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return MultiSelect(
-            items: items,
-            selectedProducts: _selectedTypProduktu,
-            selectedPrice: selectedPrice,
-            url: url,
-            onChangedUrlCallback: (newUrl) {
-              setState(() {
-                responseData = [];
-                products = [];
-                url = newUrl;
-              });
-            });
+        return MultiSelect(items: items);
       },
     );
 
     if (results != null) {
-      setState(() {
-        _selectedTypProduktu.clear();
-        _selectedTypProduktu.addAll(results);
-      });
+      setState(() {});
     }
+  }
+
+  void _filterData(String text) {
+    filteredData = responseData
+        .where((item) =>
+            (item['brand']?.toLowerCase().contains(text.toLowerCase()) ??
+                false) ||
+            (item['line']?.toLowerCase().contains(text.toLowerCase()) ??
+                false) ||
+            (item['productLink']?.toLowerCase().contains(text.toLowerCase()) ??
+                false))
+        .toList();
   }
 
   Widget _buildHeader() {
@@ -188,23 +196,21 @@ class _HomeScreenState extends State<HomeScreen> {
     return InkWell(
       onTap: () {
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductDetails(
-              productURL: product.productLink,
-            ),
-          ),
-        );
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProductDetails(
+                      productURL: product.productLink,
+                    )));
       },
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Theme.of(context).colorScheme.secondary,
+          color: Theme.of(context).colorScheme.primary,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 4,
+              spreadRadius: 5,
+              blurRadius: 10,
               offset: const Offset(0, 3),
             ),
           ],
@@ -218,27 +224,9 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 150,
               height: 150,
               child: Image.network(
-                product.imageUrl,
-                loadingBuilder: (BuildContext context, Widget child,
-                    ImageChunkEvent? loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child; // Obraz został wczytany, zwróć go
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                (loadingProgress.expectedTotalBytes ?? 1)
-                            : null,
-                      ),
-                    );
-                  }
-                },
-                errorBuilder: (BuildContext context, Object error,
-                    StackTrace? stackTrace) {
-                  return Image.network(
-                      defaultImage); // Zwróć domyślny obraz w przypadku błędu
-                },
+                product.imageUrl.isNotEmpty
+                    ? product.imageUrl
+                    : 'https://i.notino.com/detail_thumb/4711/471oriu_aedc08_03/4711-original-woda-kolonska-bez-atomizera-unisex___117.jpg',
               ),
             ),
             Padding(
@@ -280,7 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w800,
-              color: Theme.of(context).colorScheme.onSecondary,
+              color: Theme.of(context).colorScheme.secondaryContainer,
             ),
           ),
           TextSpan(
@@ -288,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w300,
-              color: Theme.of(context).colorScheme.secondaryContainer,
+              color: Theme.of(context).colorScheme.onSecondary,
             ),
           ),
         ],
@@ -301,34 +289,33 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondary,
+        color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 3,
-            spreadRadius: 1,
-            offset: const Offset(0, 2),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
       child: Autocomplete<String>(
         optionsBuilder: (TextEditingValue textEditingValue) {
           _headerTypeSearch(textEditingValue.text);
-          return responseData
-              .map<String>((data) => "${data['brand']}-${data['line']}");
+          _filterData(textEditingValue.text);
+          return responseData.map<String>((data) => data['line']).toList();
         },
         onSelected: (String selectedValue) {
-          var foundedProduct = responseData
-              .where((e) => '${e['brand']}-${e['line']}' == selectedValue)
-              .first;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  ProductDetails(productURL: foundedProduct['productLink']),
-            ),
+          var selectedObject = filteredData.firstWhere(
+            (element) => element.containsValue(selectedValue),
+            orElse: () => <String, dynamic>{},
           );
+          //print(selectedObject['productLink']);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ProductDetails(
+                      productURL: selectedObject['productLink'])));
         },
         fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
           return TextField(
@@ -339,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> {
               hintText: 'Search here',
               prefixIcon: const Icon(Icons.search),
               suffixIcon: InkWell(
-                onTap: () => _showMultiSelect(_typProduktu, _selectedPrice),
+                onTap: () => _showMultiSelect(_typProduktu),
                 child: const Icon(Icons.filter_list),
               ),
               border: InputBorder.none,
@@ -388,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.all(5),
                         staggeredTileBuilder: (index) {
                           return StaggeredTile.count(
-                              1, index.isEven ? 2.2 : 2.3);
+                              1, index.isEven ? 2.0 : 2.3);
                         },
                         crossAxisCount: 2,
                         crossAxisSpacing: 10,
