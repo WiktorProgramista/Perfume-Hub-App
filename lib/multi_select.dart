@@ -30,10 +30,11 @@ class _MultiSelectState extends State<MultiSelect> {
     setState(() {
       if (isSelected) {
         _selectedItems.add(itemValue);
+        widget.onChangedUrl(_setProductTypeURL(itemValue, widget.url));
       } else {
         _selectedItems.remove(itemValue);
+        widget.onChangedUrl("https://perfumehub.pl/");
       }
-      widget.onChangedUrl(_setProductTypeURL(itemValue, widget.url));
       Navigator.of(context).pop(_selectedItems.toSet());
     });
   }
