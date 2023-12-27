@@ -301,15 +301,24 @@ class _ProductDetailsState extends State<ProductDetails> {
       alignment: WrapAlignment.spaceEvenly,
       runSpacing: 5,
       children: variantsTitle.map((variant) {
-        return Container(
-          width: 100,
-          height: 80,
-          padding: const EdgeInsets.all(5.0),
-          decoration: BoxDecoration(color: Colors.grey.withOpacity(0.2)),
-          child: Center(
-            child: Text(
-              variant.title,
-              textAlign: TextAlign.center,
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ProductDetails(productURL: variant.url)));
+          },
+          child: Container(
+            width: 100,
+            height: 80,
+            padding: const EdgeInsets.all(5.0),
+            decoration: BoxDecoration(color: Colors.grey.withOpacity(0.2)),
+            child: Center(
+              child: Text(
+                variant.title,
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         );
