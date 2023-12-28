@@ -58,26 +58,22 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     scrolController.addListener(_scrollListener);
-    fetchProducts(1);
   }
 
   Future<void> _scrollListener() async {
     if (scrolController.position.pixels ==
         scrolController.position.maxScrollExtent) {
       setState(() {
-        isLoading = true;
-      });
-      _currentPage++;
-      await fetchProducts(_currentPage);
-      setState(() {
-        isLoading = false;
+        _currentPage++;
       });
     }
   }
 
-  Future<void> fetchProducts(int page) async {
+  Future<List<Product>> fetchProducts(int page) async {
+    List<Product> products = [];
     final response =
         await http.get(Uri.parse('https://perfumehub.pl/?page=$page'));
+    print(page);
     if (response.statusCode == 200) {
       final document = htmlparser.parse(response.body);
       final elements =
@@ -101,9 +97,9 @@ class _HomeScreenState extends State<HomeScreen> {
           priceChange: priceChangeElement?.text.trim() ?? '',
           productLink: productLink ?? '',
         );
-
         products.add(product);
       }
+      return products;
     } else {
       throw Exception('Request API error');
     }
@@ -191,8 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildPerfumeContainer(int index) {
-    final product = products[index];
+  Widget _buildPerfumeContainer(Product product) {
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -223,11 +218,10 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(
               width: 150,
               height: 150,
-              child: Image.network(
-                product.imageUrl.isNotEmpty
-                    ? product.imageUrl
-                    : 'https://i.notino.com/detail_thumb/4711/471oriu_aedc08_03/4711-original-woda-kolonska-bez-atomizera-unisex___117.jpg',
-              ),
+              child: Image.network(product.imageUrl,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const CircularProgressIndicator(),
+                  loadingBuilder: (context, child, loadingProgress) => child),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -343,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: FutureBuilder(
         future: fetchProducts(_currentPage),
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+          if (!snapshot.hasData) {
             return const Center(
               child: CircularProgressIndicator(),
             );
@@ -380,9 +374,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisCount: 2,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
-                        itemCount: products.length,
+                        itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
-                          return _buildPerfumeContainer(index);
+                          return _buildPerfumeContainer(snapshot.data![index]);
                         },
                       ),
                     ),
