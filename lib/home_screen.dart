@@ -287,28 +287,29 @@ class _HomeScreenState extends State<HomeScreen> {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            blurRadius: 3,
+            spreadRadius: 1,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Autocomplete<String>(
         optionsBuilder: (TextEditingValue textEditingValue) {
           _headerTypeSearch(textEditingValue.text);
-          _filterData(textEditingValue.text);
-          return responseData.map<String>((data) => data['line']).toList();
+          return responseData
+              .map<String>((data) => "${data['brand']}-${data['line']}");
         },
         onSelected: (String selectedValue) {
-          var selectedObject = filteredData.firstWhere(
-            (element) => element.containsValue(selectedValue),
-            orElse: () => <String, dynamic>{},
-          );
-          //print(selectedObject['productLink']);
+          var foundedProduct = responseData
+              .where((e) => '${e['brand']}-${e['line']}' == selectedValue)
+              .first;
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ProductDetails(
-                      productURL: selectedObject['productLink'])));
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  ProductDetails(productURL: foundedProduct['productLink']),
+            ),
+          );
         },
         fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
           return TextField(
