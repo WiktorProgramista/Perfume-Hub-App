@@ -70,7 +70,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<List<Product>> fetchProducts(int page) async {
-    List<Product> products = [];
     final response =
         await http.get(Uri.parse('https://perfumehub.pl/?page=$page'));
     print(page);
