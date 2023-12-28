@@ -5,9 +5,9 @@ ThemeData lightTheme = ThemeData(
         MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
       return Colors.black;
     })),
-    primaryColor: Colors.black,
+    primaryColor: Colors.white,
     brightness: Brightness.light,
     colorScheme: const ColorScheme.light(
         background: Colors.white,
         primary: Colors.white,
-        secondary: Colors.white));
+        secondary: Colors.black));
