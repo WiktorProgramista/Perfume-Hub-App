@@ -28,7 +28,6 @@ class _ProductChartState extends State<ProductChart> {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      print(data);
       setState(() {
         priceData = data;
       });

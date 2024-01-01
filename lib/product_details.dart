@@ -5,9 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as htmlparser;
 import 'package:perfume_hub_app/objects/offers.dart';
 import 'package:perfume_hub_app/objects/price_history.dart';
+import 'package:perfume_hub_app/objects/saved_product.dart';
 import 'package:perfume_hub_app/objects/type_link.dart';
 import 'package:perfume_hub_app/objects/variant_title.dart';
 import 'package:perfume_hub_app/product_chart.dart';
+import 'package:perfume_hub_app/services/save_product_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetails extends StatefulWidget {
@@ -28,6 +30,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   String productLine = "";
   String productSubtitle = '';
   bool isLoaded = false;
+  bool isLiked = false;
   late PriceHistory priceHistory;
 
   @override
@@ -196,9 +199,25 @@ class _ProductDetailsState extends State<ProductDetails> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.favorite_border_outlined),
+            icon: Icon(Icons.favorite_border_outlined,
+                color: isLiked == false ? Colors.white : Colors.red),
             onPressed: () {
-              if (isLoaded) {}
+              setState(() {
+                isLiked = !isLiked;
+              });
+              if (isLoaded) {
+                SaveProductService service = SaveProductService();
+                service.saveProducts([
+                  SavedProduct(
+                      productUrl: widget.productURL!,
+                      productBrand: productBrand,
+                      productLine: productLine,
+                      subTitle: productSubtitle,
+                      imageUrl: productImage,
+                      isLiked: false)
+                ]);
+                service.getSavedProducts();
+              }
             },
           ),
           const SizedBox(width: 20),
