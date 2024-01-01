@@ -24,7 +24,6 @@ class _ProductChartState extends State<ProductChart> {
     var p = widget.priceHistory;
     var url =
         "https://perfumehub.pl/price-history?size=${p.dataSize}&mode=${p.dataMode}&brand=${p.dataBrand}&line=${p.dataLine}&gender=${p.dataGender}&type=${p.dataType}&sizeUnit=${p.dataSizeUnit}&refill=${p.dataRefill}&tester=${p.dataTester}&isSet=${p.dataIsset}&period=365";
-    print(url);
     var response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {

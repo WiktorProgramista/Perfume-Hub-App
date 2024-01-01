@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:perfume_hub_app/home_screen.dart';
-import 'package:perfume_hub_app/product_details.dart';
 import 'package:perfume_hub_app/saved_products.dart';
 import 'package:perfume_hub_app/settings.dart';
 

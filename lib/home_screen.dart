@@ -359,21 +359,31 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Expanded(
-                          child: StaggeredGridView.countBuilder(
-                            controller: scrolController,
-                            padding: const EdgeInsets.all(5),
-                            staggeredTileBuilder: (index) {
-                              return StaggeredTile.count(
-                                  1, index.isEven ? 2.0 : 2.3);
+                          child: RefreshIndicator(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.onSecondary,
+                            onRefresh: () async {
+                              setState(() {
+                                products.clear();
+                                fetchProducts(1, provider.url);
+                              });
                             },
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              return _buildPerfumeContainer(
-                                  snapshot.data![index]);
-                            },
+                            child: StaggeredGridView.countBuilder(
+                              controller: scrolController,
+                              padding: const EdgeInsets.all(5),
+                              staggeredTileBuilder: (index) {
+                                return StaggeredTile.count(
+                                    1, index.isEven ? 2.0 : 2.3);
+                              },
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) {
+                                return _buildPerfumeContainer(
+                                    snapshot.data![index]);
+                              },
+                            ),
                           ),
                         ),
                       ],
