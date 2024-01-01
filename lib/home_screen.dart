@@ -31,13 +31,17 @@ class _HomeScreenState extends State<HomeScreen> {
   final scrolController = ScrollController();
   int _currentPage = 1;
   final Set<String> _selectedProducts = {};
+  final Map<String, String> _selectedPrice = {
+    "startPrice": "0",
+    "endPrice": "0"
+  };
 
   @override
   void initState() {
-    super.initState();
     scrolController.addListener(_scrollListener);
     Provider.of<HeaderProvider>(context, listen: false)
         .addListener(_onHeaderProviderChange);
+    super.initState();
   }
 
   Future<void> _scrollListener() async {
@@ -123,6 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return MultiSelect(
             items: items,
             selectedProducts: _selectedProducts,
+            selectedPrice: _selectedPrice,
           );
         });
     if (results != null) {
