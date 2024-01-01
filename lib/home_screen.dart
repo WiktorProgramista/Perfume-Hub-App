@@ -53,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final scrolController = ScrollController();
   int _currentPage = 1;
   bool isLoading = false;
+  Set<String> _selectedProducts = {};
 
   @override
   void initState() {
@@ -121,28 +122,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showMultiSelect(List<String> items) async {
-    final List<String>? results = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return MultiSelect(items: items);
-      },
-    );
-
-    if (results != null) {
-      setState(() {});
+    final Set<String>? _results = await showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return MultiSelect(
+            items: items,
+            selectedProducts: _selectedProducts,
+          );
+        });
+    if (_results != null) {
+      setState(() {
+        _selectedProducts.clear();
+        _selectedProducts.addAll(_results);
+      });
     }
-  }
-
-  void _filterData(String text) {
-    filteredData = responseData
-        .where((item) =>
-            (item['brand']?.toLowerCase().contains(text.toLowerCase()) ??
-                false) ||
-            (item['line']?.toLowerCase().contains(text.toLowerCase()) ??
-                false) ||
-            (item['productLink']?.toLowerCase().contains(text.toLowerCase()) ??
-                false))
-        .toList();
   }
 
   Widget _buildHeader() {
