@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
             TextSpan(
               text: 'Perfume',
               style: TextStyle(
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.secondary,
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
               ),
