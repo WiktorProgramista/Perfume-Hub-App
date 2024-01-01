@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
 // ignore: depend_on_referenced_packages
 import 'package:html/parser.dart' as htmlparser;
 import 'package:perfume_hub_app/objects/offers.dart';
+import 'package:perfume_hub_app/objects/price_history.dart';
 import 'package:perfume_hub_app/objects/type_link.dart';
 import 'package:perfume_hub_app/objects/variant_title.dart';
 import 'package:perfume_hub_app/product_chart.dart';
@@ -20,14 +20,15 @@ class ProductDetails extends StatefulWidget {
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
-  List<dynamic> priceData = [];
   List<VariantTitle> variantsTitle = [];
   List<Offers> offers = [];
   List<TypeLink> typeLinks = [];
   String productImage = '';
-  String productTitle = '';
+  String productBrand = '';
+  String productLine = "";
   String productSubtitle = '';
   bool isLoaded = false;
+  late PriceHistory priceHistory;
 
   @override
   void initState() {
@@ -41,22 +42,6 @@ class _ProductDetailsState extends State<ProductDetails> {
       setState(() {
         isLoaded = true;
       });
-    }
-  }
-
-  Future<void> fetchAPIData(obj) async {
-    var url =
-        'https://perfumehub.pl/price-history?size=100&mode=product&brand=${obj['brand']}&line=${obj['line']}&gender=male&type=edt&sizeUnit=ml&refill=false&tester=false&isSet=false&period=365';
-
-    var response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        priceData = data;
-      });
-    } else {
-      throw Exception('Request API error');
     }
   }
 
@@ -142,11 +127,37 @@ class _ProductDetailsState extends State<ProductDetails> {
         await http.get(Uri.parse('https://perfumehub.pl${widget.productURL}'));
     if (response.statusCode == 200) {
       final document = htmlparser.parse(response.body);
+
+      var historyTrigger =
+          document.getElementsByClassName('price-history-trigger')[0];
+      var dataBrand = historyTrigger.attributes['data-brand'];
+      var dataLine = historyTrigger.attributes['data-line'];
+      var dataGender = historyTrigger.attributes['data-gender'];
+      var dataType = historyTrigger.attributes['data-type'];
+      var dataSize = historyTrigger.attributes['data-size'];
+      var dataSizeUnit = historyTrigger.attributes['data-sizeunit'];
+      var dataRefill = historyTrigger.attributes['data-refill'];
+      var dataTester = historyTrigger.attributes['data-tester'];
+      var dataIsset = historyTrigger.attributes['data-isset'];
+      var dataMode = historyTrigger.attributes['data-mode'];
+
+      priceHistory = PriceHistory(
+          dataBrand: dataBrand!,
+          dataLine: dataLine!,
+          dataGender: dataGender!,
+          dataType: dataType!,
+          dataSize: dataSize!,
+          dataSizeUnit: dataSizeUnit!,
+          dataRefill: dataRefill!,
+          dataTester: dataTester!,
+          dataIsset: dataIsset!,
+          dataMode: dataMode!);
+
       productImage =
           document.getElementsByTagName('img')[0].attributes['src'] ??
               'https://perfumehub.pl/images/default_image.jpg';
-      productTitle =
-          document.getElementsByClassName('title d-none d-md-block')[0].text;
+      productBrand = document.getElementsByClassName('brand')[1].text;
+      productLine = document.getElementsByClassName('line')[1].text;
       productSubtitle =
           document.getElementsByClassName('subtitle d-none d-md-block')[0].text;
 
@@ -184,9 +195,9 @@ class _ProductDetailsState extends State<ProductDetails> {
           },
         ),
         actions: [
-          InkWell(
-            child: const Icon(Icons.favorite_border_outlined),
-            onTap: () {
+          IconButton(
+            icon: const Icon(Icons.favorite_border_outlined),
+            onPressed: () {
               if (isLoaded) {}
             },
           ),
@@ -194,13 +205,14 @@ class _ProductDetailsState extends State<ProductDetails> {
           InkWell(
             child: const Icon(Icons.bar_chart),
             onTap: () {
-              if (isLoaded) {
+              if (isLoaded &&
+                  productBrand.isNotEmpty &&
+                  productLine.isNotEmpty) {
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProductChart(data: priceData),
-                  ),
-                );
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ProductChart(priceHistory: priceHistory)));
               }
             },
           ),
@@ -231,7 +243,13 @@ class _ProductDetailsState extends State<ProductDetails> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        productTitle,
+                        productBrand,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontSize: 25, fontWeight: FontWeight.w800),
+                      ),
+                      Text(
+                        productLine,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                             fontSize: 25, fontWeight: FontWeight.w800),

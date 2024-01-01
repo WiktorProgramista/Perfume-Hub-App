@@ -12,5 +12,5 @@ ThemeData darkTheme = ThemeData(
       primary: Colors.grey[900]!,
       onSecondary: Colors.orange.shade800,
       secondaryContainer: Colors.red,
-      secondary: Colors.grey[800]!),
+      secondary: Colors.grey[900]!),
 );

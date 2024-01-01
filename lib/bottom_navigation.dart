@@ -14,7 +14,6 @@ class BottomNavigation extends StatefulWidget {
 class _BottomNavigationState extends State<BottomNavigation> {
   List<Widget> pages = [
     const HomeScreen(),
-    const ProductDetails(),
     const SavedProducts(),
     const Settings()
   ];
@@ -42,16 +41,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
                   currentIndex = index;
                 });
               },
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.secondary,
               selectedItemColor: Colors.white,
               unselectedItemColor: Colors.grey,
               currentIndex: currentIndex,
               items: const [
-                BottomNavigationBarItem(
-                  backgroundColor: Colors.black,
-                  icon: Icon(Icons.home),
-                  label: 'Home',
-                ),
                 BottomNavigationBarItem(
                   backgroundColor: Colors.black,
                   icon: Icon(Icons.home),
