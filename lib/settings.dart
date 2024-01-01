@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:perfume_hub_app/theme/theme_cubit.dart';
+import 'package:perfume_hub_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class Settings extends StatelessWidget {

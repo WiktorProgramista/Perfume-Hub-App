@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:perfume_hub_app/bottom_navigation.dart';
+import 'package:perfume_hub_app/providers/header_provider.dart';
 import 'package:perfume_hub_app/theme/dark_theme.dart';
 import 'package:perfume_hub_app/theme/light_theme.dart';
-import 'package:perfume_hub_app/theme/theme_cubit.dart';
+import 'package:perfume_hub_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  runApp(ChangeNotifierProvider<ThemeProvider>(
-    create: (_) => ThemeProvider()..initialize(),
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => ThemeProvider()..initialize()),
+      ChangeNotifierProvider(create: (_) => HeaderProvider()..initialize())
+    ],
     child: const MyApp(),
   ));
 }

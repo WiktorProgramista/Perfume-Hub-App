@@ -6,32 +6,11 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:http/http.dart' as http;
 // ignore: depend_on_referenced_packages
 import 'package:html/parser.dart' as htmlparser;
+import 'package:perfume_hub_app/providers/header_provider.dart';
 import 'package:perfume_hub_app/multi_select.dart';
+import 'package:perfume_hub_app/objects/product.dart';
 import 'package:perfume_hub_app/product_details.dart';
-
-void main() {
-  runApp(const MaterialApp(
-    home: HomeScreen(),
-  ));
-}
-
-class Product {
-  final String title;
-  final String subtitle;
-  final String imageUrl;
-  final String price;
-  final String priceChange;
-  final String productLink;
-
-  Product({
-    required this.title,
-    required this.subtitle,
-    required this.imageUrl,
-    required this.price,
-    required this.priceChange,
-    required this.productLink,
-  });
-}
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -48,17 +27,17 @@ class _HomeScreenState extends State<HomeScreen> {
     'nie zestaw'
   ];
   List<Map<String, dynamic>> responseData = [];
-  List filteredData = [];
   List<Product> products = [];
   final scrolController = ScrollController();
   int _currentPage = 1;
-  bool isLoading = false;
-  Set<String> _selectedProducts = {};
+  final Set<String> _selectedProducts = {};
 
   @override
   void initState() {
     super.initState();
     scrolController.addListener(_scrollListener);
+    Provider.of<HeaderProvider>(context, listen: false)
+        .addListener(_onHeaderProviderChange);
   }
 
   Future<void> _scrollListener() async {
@@ -70,10 +49,27 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<List<Product>> fetchProducts(int page) async {
-    final response =
-        await http.get(Uri.parse('https://perfumehub.pl/?page=$page'));
-    print(page);
+  Uri addQueryParameters(String originalUri, Map<dynamic, dynamic> newParams) {
+    return Uri.parse(originalUri).replace(queryParameters: {
+      ...Uri.parse(originalUri).queryParameters,
+      ...newParams,
+    });
+  }
+
+  void _onHeaderProviderChange() {
+    String currentUrl =
+        Provider.of<HeaderProvider>(context, listen: false).currentUrl;
+    setState(() {
+      products.clear();
+    });
+    fetchProducts(_currentPage, currentUrl);
+  }
+
+  Future<List<Product>> fetchProducts(int page, String providerUrl) async {
+    var url = addQueryParameters(providerUrl, {"page": _currentPage.toString()})
+        .toString()
+        .toString();
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final document = htmlparser.parse(response.body);
       final elements =
@@ -114,7 +110,6 @@ class _HomeScreenState extends State<HomeScreen> {
       final Map<String, dynamic> data = json.decode(response.body);
       setState(() {
         responseData = List<Map<String, dynamic>>.from(data['products']);
-        //print(responseData.toString());
       });
     } else {
       throw Exception('Request API error');
@@ -122,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showMultiSelect(List<String> items) async {
-    final Set<String>? _results = await showModalBottomSheet(
+    final Set<String>? results = await showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
           return MultiSelect(
@@ -130,10 +125,10 @@ class _HomeScreenState extends State<HomeScreen> {
             selectedProducts: _selectedProducts,
           );
         });
-    if (_results != null) {
+    if (results != null) {
       setState(() {
         _selectedProducts.clear();
-        _selectedProducts.addAll(_results);
+        _selectedProducts.addAll(results);
       });
     }
   }
@@ -196,8 +191,8 @@ class _HomeScreenState extends State<HomeScreen> {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 3,
+              spreadRadius: 2,
+              blurRadius: 4,
               offset: const Offset(0, 3),
             ),
           ],
@@ -326,60 +321,65 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder(
-        future: fetchProducts(_currentPage),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else {
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(),
-                    const SizedBox(height: 10.0),
-                    _buildSearchBar(),
-                    const SizedBox(height: 10.0),
-                    const Text(
-                      'Lista Produktów',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                      ),
+    return Consumer<HeaderProvider>(
+      builder: (context, provider, child) {
+        return Scaffold(
+          body: FutureBuilder(
+            future: fetchProducts(_currentPage, provider.currentUrl),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${snapshot.error}'),
+                );
+              } else {
+                return SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildHeader(),
+                        const SizedBox(height: 10.0),
+                        _buildSearchBar(),
+                        const SizedBox(height: 10.0),
+                        const Text(
+                          'Lista Produktów',
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Expanded(
+                          child: StaggeredGridView.countBuilder(
+                            controller: scrolController,
+                            padding: const EdgeInsets.all(5),
+                            staggeredTileBuilder: (index) {
+                              return StaggeredTile.count(
+                                  1, index.isEven ? 2.0 : 2.3);
+                            },
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              return _buildPerfumeContainer(
+                                  snapshot.data![index]);
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: StaggeredGridView.countBuilder(
-                        controller: scrolController,
-                        padding: const EdgeInsets.all(5),
-                        staggeredTileBuilder: (index) {
-                          return StaggeredTile.count(
-                              1, index.isEven ? 2.0 : 2.3);
-                        },
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          return _buildPerfumeContainer(snapshot.data![index]);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-        },
-      ),
+                  ),
+                );
+              }
+            },
+          ),
+        );
+      },
     );
   }
 }
