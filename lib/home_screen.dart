@@ -137,9 +137,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHeader() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.sort, size: 33),
         RichText(
           text: TextSpan(children: [
             TextSpan(
@@ -159,18 +158,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ]),
-        ),
-        Container(
-          width: 50,
-          height: 50,
-          padding: const EdgeInsets.all(5.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(13),
-            image: const DecorationImage(
-              fit: BoxFit.cover,
-              image: AssetImage('assets/profile.jpg'),
-            ),
-          ),
         ),
       ],
     );
@@ -194,8 +181,8 @@ class _HomeScreenState extends State<HomeScreen> {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              spreadRadius: 2,
-              blurRadius: 4,
+              spreadRadius: 0.1,
+              blurRadius: 7,
               offset: const Offset(0, 3),
             ),
           ],
@@ -273,7 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildSearchBar() {
     return Container(
-      padding: const EdgeInsets.all(4.0),
+      padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(10),
@@ -364,13 +351,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 10.0),
                         _buildSearchBar(),
                         const SizedBox(height: 10.0),
-                        const Text(
-                          'Lista Produktów',
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                         Expanded(
                           child: RefreshIndicator(
                             backgroundColor:
