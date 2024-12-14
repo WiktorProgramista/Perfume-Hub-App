@@ -40,7 +40,9 @@ class _ProductDetailsState extends State<ProductDetails> {
   Future<void> fetchData() async {
     if (!isLoaded) {
       await fetchProductInfo(widget.productURL);
+      var isFav = await toggleProductFavourite(productImage, productBrand, productLine);
       setState(() {
+        isLiked = isFav;
         isLoaded = true;
       });
     }
@@ -168,6 +170,30 @@ class _ProductDetailsState extends State<ProductDetails> {
     }
   }
 
+  Future<bool> toggleProductFavourite(
+    String productImage, String productBrand, String productLine) async {
+    SaveProductService saveProductService = SaveProductService();
+    var savedProducts = await saveProductService.getSavedProducts();
+
+    for (var product in savedProducts) {
+      if (product.imageUrl == productImage &&
+          product.productBrand == productBrand &&
+          product.productLine == productLine) {
+        // Odwrócenie wartości isLiked
+        product.isLiked = !product.isLiked;
+
+        // Zapisanie zmodyfikowanej listy produktów
+        await saveProductService.saveProducts(savedProducts);
+
+        // Zwrócenie nowej wartości isLiked
+        return product.isLiked;
+      }
+    }
+
+    // Jeśli żaden produkt nie pasuje, zwróć false
+    return false;
+  }
+
   Future<void> openURL(url) async {
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
@@ -198,7 +224,7 @@ class _ProductDetailsState extends State<ProductDetails> {
         actions: [
           IconButton(
             icon: Icon(Icons.favorite_border_outlined,
-                color: isLiked == false ? Colors.white : Colors.red),
+                color: isLiked == false ? Theme.of(context).primaryColor : Colors.red),
             onPressed: () {
               setState(() {
                 isLiked = !isLiked;

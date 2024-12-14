@@ -4,7 +4,7 @@ class SavedProduct {
   final String productLine;
   final String subTitle;
   final String imageUrl;
-  bool isLiked;
+  bool isLiked = false;
 
   SavedProduct({
     required this.productUrl,
